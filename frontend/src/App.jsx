@@ -24,6 +24,7 @@ import Onboarding from './pages/participant/Onboarding';
 // Organizer pages
 import OrganizerDashboard from './pages/organizer/Dashboard';
 import CreateEvent from './pages/organizer/CreateEvent';
+import EditEvent from './pages/organizer/EditEvent';
 import OrganizerEventDetails from './pages/organizer/EventDetails';
 import OrganizerProfile from './pages/organizer/Profile';
 import PaymentApprovals from './pages/organizer/PaymentApprovals';
@@ -98,6 +99,11 @@ function App() {
               <Route path="/organizer/events/create" element={
                 <ProtectedRoute allowedRoles={['organizer']}>
                   <CreateEvent />
+                </ProtectedRoute>
+              } />
+              <Route path="/organizer/events/:id/edit" element={
+                <ProtectedRoute allowedRoles={['organizer']}>
+                  <EditEvent />
                 </ProtectedRoute>
               } />
               <Route path="/organizer/events/:id" element={

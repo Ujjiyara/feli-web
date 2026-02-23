@@ -271,7 +271,8 @@ const getTicket = async (req, res, next) => {
       attended: registration.attendance,
       qrCode: registration.qrCode,
       event: registration.eventId,
-      participant: registration.participantId
+      participant: registration.participantId,
+      merchandiseOrder: registration.merchandiseOrder
     };
 
     res.json({
@@ -318,6 +319,10 @@ const uploadPaymentProof = async (req, res, next) => {
 
     registration.merchandiseOrder.paymentProof = paymentProof;
     registration.merchandiseOrder.paymentApprovalStatus = 'PENDING';
+    
+    // Explicitly tell Mongoose that this nested object has changed
+    registration.markModified('merchandiseOrder');
+    
     await registration.save();
 
     res.json({
