@@ -1,0 +1,54 @@
+Felicity Event Management Platform - Deployment Guide
+
+This project is a full-stack MERN application (MongoDB, Express.js, React, Node.js). Follow these steps to properly deploy it for production.
+
+---
+
+### Step 1: Database (MongoDB Atlas)
+
+1. Create a free account at [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
+2. Build a new cluster (M0 Free Tier is sufficient).
+3. Under "Database Access", create a new database user with a secure password.
+4. Under "Network Access", add `0.0.0.0/0` to allow connections from anywhere (required for most PaaS deployments).
+5. Click "Connect", choose "Drivers", and copy your connection string. It will look like: 
+   `mongodb+srv://<username>:<password>@cluster.mongodb.net/felicity?retryWrites=true&w=majority`
+
+---
+
+### Step 2: Backend (Render / Heroku)
+
+Deploying the Express.js API. We recommend Render.com for its easy free tier.
+
+1. Create a new "Web Service" on [Render](https://render.com/).
+2. Connect your GitHub repository and select the `backend` directory as the Root Directory.
+3. Configuration:
+   - **Environment**: Node
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+4. **Critical**: Add the following Environment Variables (found in your `.env`):
+   - `PORT`: 5000
+   - `MONGODB_URI`: Insert your Atlas connection string from Step 1.
+   - `JWT_SECRET`: Generate a random long string for token signing security.
+   - `CLIENT_URL`: The URL of where your frontend will be deployed (e.g., `https://felicity-web.vercel.app`). This is required for CORS to work securely.
+   - `SMTP_USER` & `SMTP_PASS` & `EMAIL_FROM`: Mailtrap or SendGrid credentials for sending ticket emails.
+5. Deploy and copy the resulting API URL (e.g., `https://felicity-api.onrender.com`).
+
+---
+
+### Step 3: Frontend (Vercel / Netlify)
+
+Deploying the React client. We recommend Vercel.
+
+1. Go to [Vercel](https://vercel.com/) and "Add New Project".
+2. Import your GitHub repository.
+3. Set the Framework Preset to "Vite" (Vercel should detect this automatically).
+4. Set the Root Directory to `frontend`.
+5. **Critical**: Add the following Environment Variables:
+   - `VITE_API_URL`: Insert your Backend API URL from Step 2 (e.g., `https://felicity-api.onrender.com/api`).
+6. Click Deploy.
+
+### Step 4: Verification
+
+1. Once the frontend is live, navigate to the URL.
+2. Register a new user to confirm the Frontend can successfully contact the Backend and that the Backend can successfully write to the MongoDB Atlas database.
+3. Ensure you have the `roles` correctly configured in your database for your Organizer/Admin accounts if they are hardcoded.

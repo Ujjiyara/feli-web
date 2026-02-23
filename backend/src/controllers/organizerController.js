@@ -419,17 +419,16 @@ const exportParticipantsCSV = async (req, res, next) => {
       .populate('participantId', 'firstName lastName email contactNumber collegeName');
 
     // Generate CSV
-    const headers = ['Ticket ID', 'Name', 'Email', 'Contact', 'College', 'Status', 'Registration Date', 'Attendance'];
+    const headers = ['Ticket ID', 'Name', 'Email', 'Reg Date', 'Payment', 'Team', 'Attendance'];
     const rows = registrations.map(r => {
       const user = r.participantId;
       return [
         r.ticketId,
         user ? `${user.firstName} ${user.lastName}` : 'N/A',
         user?.email || 'N/A',
-        user?.contactNumber || 'N/A',
-        user?.collegeName || 'N/A',
-        r.status,
         r.createdAt.toISOString(),
+        r.paymentAmount ? `₹${r.paymentAmount}` : 'Free',
+        r.teamId ? (r.teamId.name || 'Yes') : 'N/A',
         r.attendance?.checked ? 'Yes' : 'No'
       ].join(',');
     });
