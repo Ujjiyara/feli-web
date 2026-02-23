@@ -4,6 +4,7 @@ import { eventService } from '../../services';
 import { useAuth } from '../../context/AuthContext';
 import { FiCalendar, FiMapPin, FiUsers, FiDollarSign, FiClock, FiCheck, FiDownload } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import { formatDate, formatTime } from '../../utils/dateUtils';
 import { downloadCalendarEvent, getGoogleCalendarUrl } from '../../utils/calendarUtils';
 import DiscussionForum from '../../components/common/DiscussionForum';
 import './EventDetails.css';
@@ -68,21 +69,7 @@ const EventDetails = () => {
     }
   };
 
-  const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-IN', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
 
-  const formatTime = (date) => {
-    return new Date(date).toLocaleTimeString('en-IN', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
 
   if (loading) {
     return (

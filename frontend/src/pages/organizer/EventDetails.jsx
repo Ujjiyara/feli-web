@@ -4,6 +4,7 @@ import { organizerService } from '../../services';
 import { FiUsers, FiMail, FiDownload, FiCheck, FiX, FiArrowLeft, FiEdit, FiTrash2, FiCamera, FiSearch } from 'react-icons/fi';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import toast from 'react-hot-toast';
+import { formatDateTime as formatDate } from '../../utils/dateUtils';
 import './EventDetails.css';
 
 const OrganizerEventDetails = () => {
@@ -45,6 +46,9 @@ const OrganizerEventDetails = () => {
       } else if (newStatus === 'CANCELLED') {
         if (!window.confirm('Are you sure you want to cancel this event?')) return;
         response = await organizerService.cancelEvent(id);
+      } else if (newStatus === 'ONGOING' || newStatus === 'COMPLETED') {
+        if (newStatus === 'COMPLETED' && !window.confirm('Are you sure you want to mark this event as completed?')) return;
+        response = await organizerService.updateEventStatus(id, newStatus);
       }
       if (response?.success) {
         toast.success(`Event ${newStatus.toLowerCase()}`);
@@ -192,15 +196,7 @@ const OrganizerEventDetails = () => {
     toast.success('Export complete');
   };
 
-  const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-IN', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+
 
   if (loading) {
     return (
@@ -244,8 +240,21 @@ const OrganizerEventDetails = () => {
             </>
           )}
           {event.status === 'PUBLISHED' && (
-            <button className="action-btn cancel" onClick={() => handleStatusChange('CANCELLED')}>
-              <FiX /> Cancel Event
+            <>
+              <button className="action-btn" style={{ background: '#cce5ff', color: '#004085' }} onClick={() => handleStatusChange('ONGOING')}>
+                Start Event (Ongoing)
+              </button>
+              <button className="action-btn publish" onClick={() => handleStatusChange('COMPLETED')}>
+                <FiCheck /> Mark as Completed
+              </button>
+              <button className="action-btn cancel" onClick={() => handleStatusChange('CANCELLED')}>
+                <FiX /> Cancel Event
+              </button>
+            </>
+          )}
+          {event.status === 'ONGOING' && (
+            <button className="action-btn publish" onClick={() => handleStatusChange('COMPLETED')}>
+              <FiCheck /> Mark as Completed
             </button>
           )}
         </div>

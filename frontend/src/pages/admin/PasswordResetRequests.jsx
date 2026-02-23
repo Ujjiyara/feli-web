@@ -9,6 +9,7 @@ const PasswordResetRequests = () => {
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(null);
   const [adminNote, setAdminNote] = useState('');
+  const [customPassword, setCustomPassword] = useState('');
   const [showNoteFor, setShowNoteFor] = useState(null);
   const [credentials, setCredentials] = useState(null);
 
@@ -30,18 +31,20 @@ const PasswordResetRequests = () => {
   const handleProcess = async (requestId, action) => {
     setProcessing(requestId);
     try {
-      const response = await adminService.processPasswordResetRequest(requestId, action, adminNote);
+      const response = await adminService.processPasswordResetRequest(requestId, action, adminNote, customPassword);
       toast.success(`Request ${action === 'approve' ? 'approved' : 'rejected'} successfully`);
       
-      if (action === 'approve' && response.data?.newPassword) {
+      if (action === 'approve' && response.data?.credentials?.password) {
+        const reqData = requests.find(r => r._id === requestId);
         setCredentials({
-          organizerName: response.data.organizerName,
-          organizerEmail: response.data.organizerEmail,
-          newPassword: response.data.newPassword
+          organizerName: reqData?.organizerId?.name || 'Organizer',
+          organizerEmail: response.data.credentials.email,
+          newPassword: response.data.credentials.password
         });
       }
       
       setAdminNote('');
+      setCustomPassword('');
       setShowNoteFor(null);
       fetchRequests();
     } catch {
@@ -144,6 +147,13 @@ const PasswordResetRequests = () => {
                         placeholder="Add a note (optional)..."
                         value={adminNote}
                         onChange={(e) => setAdminNote(e.target.value)}
+                        style={{ marginBottom: '10px' }}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Custom password (optional, leave blank to auto-generate)..."
+                        value={customPassword}
+                        onChange={(e) => setCustomPassword(e.target.value)}
                       />
                       <div className="action-buttons">
                         <button
@@ -162,7 +172,7 @@ const PasswordResetRequests = () => {
                         </button>
                         <button
                           className="cancel-action-btn"
-                          onClick={() => { setShowNoteFor(null); setAdminNote(''); }}
+                          onClick={() => { setShowNoteFor(null); setAdminNote(''); setCustomPassword(''); }}
                         >
                           Cancel
                         </button>

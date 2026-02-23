@@ -73,10 +73,24 @@ const getAllEvents = async (req, res, next) => {
 
     const total = await Event.countDocuments(query);
 
+    const now = new Date();
+    // Convert current UTC time to IST (+5:30)
+    const nowIST = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
+    
+    const processedEvents = events.map(e => {
+      const eventData = e.toObject();
+      // Ensure we treat the stored UTC endDate as if it was meant to be the IST limit
+      const eventEndIST = new Date(eventData.endDate);
+      if (eventEndIST < nowIST && eventData.status !== 'CANCELLED') {
+        eventData.status = 'COMPLETED';
+      }
+      return eventData;
+    });
+
     res.json({
       success: true,
       data: {
-        events,
+        events: processedEvents,
         pagination: {
           page: parseInt(page),
           limit: parseInt(limit),
@@ -122,10 +136,22 @@ const getTrendingEvents = async (req, res, next) => {
       status: { $in: ['PUBLISHED', 'ONGOING'] }
     }).populate('organizerId', 'name');
 
-    // Sort by trending order
-    const sortedEvents = eventIds.map(id => 
-      events.find(e => e._id.toString() === id.toString())
-    ).filter(Boolean);
+    // Sort by trending order and process status
+    const now = new Date();
+    // Convert current UTC time to IST (+5:30)
+    const nowIST = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
+    
+    const sortedEvents = eventIds.map(id => {
+      const e = events.find(ev => ev._id.toString() === id.toString());
+      if (!e) return null;
+      
+      const eventData = e.toObject();
+      const eventEndIST = new Date(eventData.endDate);
+      if (eventEndIST < nowIST && eventData.status !== 'CANCELLED') {
+        eventData.status = 'COMPLETED';
+      }
+      return eventData;
+    }).filter(Boolean);
 
     res.json({
       success: true,
@@ -164,10 +190,20 @@ const getEventById = async (req, res, next) => {
       }).select('ticketId status');
     }
 
+    // Determine dynamic status based on time (IST adjustment)
+    const now = new Date();
+    const nowIST = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
+    
+    const eventData = event.toObject();
+    const eventEndIST = new Date(eventData.endDate);
+    if (eventEndIST < nowIST && eventData.status !== 'CANCELLED') {
+      eventData.status = 'COMPLETED';
+    }
+
     res.json({
       success: true,
       data: { 
-        event,
+        event: eventData,
         isRegistered: !!registration,
         registration
       }

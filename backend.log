@@ -1,7 +1,2 @@
 Server running on port 5000
 MongoDB Connected: ac-ll8eg8s-shard-00-02.iuvfusy.mongodb.net
-ValidationError: User validation failed: password: Path `password` (`123`, length 3) is shorter than the minimum allowed length (6).
-    at Document.invalidate (/home/saksham/SEM II-II/DASS/Assignment1/backend/node_modules/mongoose/lib/document.js:3381:32)
-    at /home/saksham/SEM II-II/DASS/Assignment1/backend/node_modules/mongoose/lib/document.js:3142:17
-    at /home/saksham/SEM II-II/DASS/Assignment1/backend/node_modules/mongoose/lib/schemaType.js:1446:9
-    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)

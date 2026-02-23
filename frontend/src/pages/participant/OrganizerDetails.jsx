@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { participantService } from '../../services';
 import { FiCalendar, FiMail, FiHeart, FiUsers } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
+import { formatDateShort as formatDate } from '../../utils/dateUtils';
 import toast from 'react-hot-toast';
 import './OrganizerDetails.css';
 
@@ -56,13 +57,7 @@ const OrganizerDetails = () => {
 
   const isFollowing = user?.followedOrganizers?.includes(id);
 
-  const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-IN', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
+
 
   if (loading) {
     return (

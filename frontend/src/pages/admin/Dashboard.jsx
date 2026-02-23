@@ -14,6 +14,7 @@ const AdminDashboard = () => {
     email: '',
     category: 'Cultural'
   });
+  const [resetModal, setResetModal] = useState({ show: false, orgId: null, orgName: '', customPassword: '' });
 
   useEffect(() => {
     fetchData();
@@ -61,12 +62,19 @@ const AdminDashboard = () => {
     }
   };
 
-  const resetPassword = async (orgId) => {
-    if (!window.confirm('Reset password for this organizer?')) return;
+  const handleResetPasswordClick = (org) => {
+    setResetModal({ show: true, orgId: org._id, orgName: org.name, customPassword: '' });
+  };
+
+  const handleConfirmReset = async (e) => {
+    e.preventDefault();
+    if (!window.confirm(`Are you sure you want to reset the password for ${resetModal.orgName}?`)) return;
+    
     try {
-      const response = await adminService.resetOrganizerPassword(orgId);
+      const response = await adminService.resetOrganizerPassword(resetModal.orgId, resetModal.customPassword);
       if (response.success) {
-        toast.success(`New password: ${response.data.newPassword}`);
+        toast.success(`New password: ${response.data.credentials.password}`);
+        setResetModal({ show: false, orgId: null, orgName: '', customPassword: '' });
       }
     } catch {
       toast.error('Failed to reset password');
@@ -152,7 +160,7 @@ const AdminDashboard = () => {
                 <button onClick={() => toggleStatus(org._id)} title="Toggle Status">
                   <FiToggleLeft />
                 </button>
-                <button onClick={() => resetPassword(org._id)} title="Reset Password">
+                <button onClick={() => handleResetPasswordClick(org)} title="Reset Password">
                   <FiKey />
                 </button>
                 <button onClick={() => deleteOrganizer(org._id)} className="delete" title="Delete">
@@ -163,6 +171,34 @@ const AdminDashboard = () => {
           ))}
         </div>
       </section>
+
+      {/* Password Reset Modal */}
+      {resetModal.show && (
+        <div className="modal-overlay" onClick={() => setResetModal({ ...resetModal, show: false })}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <h2>Reset Password for {resetModal.orgName}</h2>
+            <form onSubmit={handleConfirmReset}>
+              <div className="form-group">
+                <label>Custom Password (Optional)</label>
+                <input
+                  type="text"
+                  placeholder="Leave blank to randomly auto-generate..."
+                  value={resetModal.customPassword}
+                  onChange={(e) => setResetModal({ ...resetModal, customPassword: e.target.value })}
+                />
+              </div>
+              <div className="modal-actions">
+                <button type="button" className="cancel-btn" onClick={() => setResetModal({ ...resetModal, show: false })}>
+                  Cancel
+                </button>
+                <button type="submit" className="submit-btn" style={{ background: '#f59e0b' }}>
+                  <FiKey /> Reset Password
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Create Modal */}
       {showCreateModal && (
