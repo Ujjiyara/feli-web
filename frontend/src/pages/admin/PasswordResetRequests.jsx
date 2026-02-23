@@ -6,6 +6,7 @@ import './PasswordResetRequests.css';
 
 const PasswordResetRequests = () => {
   const [requests, setRequests] = useState([]);
+  const [activeTab, setActiveTab] = useState('PENDING');
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(null);
   const [adminNote, setAdminNote] = useState('');
@@ -71,11 +72,32 @@ const PasswordResetRequests = () => {
     return <div className="pwr-page"><div className="loading">Loading requests...</div></div>;
   }
 
+  const pendingRequests = requests.filter(r => r.status === 'PENDING');
+  const historyRequests = requests.filter(r => r.status !== 'PENDING');
+  const displayedRequests = activeTab === 'PENDING' ? pendingRequests : historyRequests;
+
   return (
     <div className="pwr-page">
       <div className="pwr-header">
         <h1><FiAlertCircle /> Password Reset Requests</h1>
         <p>Review and process organizer password reset requests</p>
+      </div>
+
+      <div className="admin-tabs" style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '1px solid #334155', paddingBottom: '1rem' }}>
+        <button 
+          className={`tab-btn ${activeTab === 'PENDING' ? 'active' : ''}`}
+          onClick={() => setActiveTab('PENDING')}
+          style={{ padding: '0.75rem 1.5rem', borderRadius: '8px', border: 'none', background: activeTab === 'PENDING' ? '#3b82f6' : 'transparent', color: activeTab === 'PENDING' ? 'white' : '#94a3b8', cursor: 'pointer', fontWeight: 'bold' }}
+        >
+          Pending ({pendingRequests.length})
+        </button>
+        <button 
+          className={`tab-btn ${activeTab === 'HISTORY' ? 'active' : ''}`}
+          onClick={() => setActiveTab('HISTORY')}
+          style={{ padding: '0.75rem 1.5rem', borderRadius: '8px', border: 'none', background: activeTab === 'HISTORY' ? '#3b82f6' : 'transparent', color: activeTab === 'HISTORY' ? 'white' : '#94a3b8', cursor: 'pointer', fontWeight: 'bold' }}
+        >
+          History ({historyRequests.length})
+        </button>
       </div>
 
       {credentials && (
@@ -103,15 +125,15 @@ const PasswordResetRequests = () => {
         </div>
       )}
 
-      {requests.length === 0 ? (
+      {displayedRequests.length === 0 ? (
         <div className="empty-state">
           <FiMessageSquare size={48} />
-          <h3>No password reset requests</h3>
-          <p>When organizers request a password reset, they will appear here.</p>
+          <h3>No requests found</h3>
+          <p>{activeTab === 'PENDING' ? 'When organizers request a password reset, they will appear here.' : 'No processed requests found in history.'}</p>
         </div>
       ) : (
         <div className="requests-list">
-          {requests.map(req => (
+          {displayedRequests.map(req => (
             <div key={req._id} className={`request-card ${req.status?.toLowerCase()}`}>
               <div className="request-header">
                 <div className="request-info">

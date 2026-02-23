@@ -210,7 +210,7 @@ const getDashboard = async (req, res, next) => {
 const getPasswordResetRequests = async (req, res, next) => {
   try {
     const PasswordResetRequest = require('../models/PasswordResetRequest');
-    const requests = await PasswordResetRequest.find({ status: 'PENDING' })
+    const requests = await PasswordResetRequest.find({})
       .populate('organizerId', 'name email category')
       .sort({ createdAt: -1 });
 
