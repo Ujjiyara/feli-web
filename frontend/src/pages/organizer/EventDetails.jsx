@@ -11,6 +11,7 @@ const OrganizerEventDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [event, setEvent] = useState(null);
+  const [analytics, setAnalytics] = useState(null);
   const [registrations, setRegistrations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('details');
@@ -26,10 +27,13 @@ const OrganizerEventDetails = () => {
   const fetchEventData = async () => {
     try {
       const [eventRes, regsRes] = await Promise.all([
-        organizerService.getEvent(id),
+        organizerService.getEventDetails(id),
         organizerService.getEventRegistrations(id)
       ]);
-      if (eventRes.success) setEvent(eventRes.data.event);
+      if (eventRes.success) {
+        setEvent(eventRes.data.event);
+        setAnalytics(eventRes.data.analytics);
+      }
       if (regsRes.success) setRegistrations(regsRes.data.registrations || []);
     } catch {
       toast.error('Failed to load event');
@@ -321,14 +325,38 @@ const OrganizerEventDetails = () => {
                 <p>{event.registrationDeadline ? formatDate(event.registrationDeadline) : 'No deadline'}</p>
               </div>
             </div>
-            
-            {event.description && (
-              <div className="description">
-                <label>Description</label>
-                <p>{event.description}</p>
-              </div>
-            )}
           </div>
+          
+          {/* Analytics Section */}
+          <div className="detail-card">
+            <h3>Analytics Overview</h3>
+            <div className="detail-grid">
+              <div className="detail-item">
+                <label>Registrations / Sales</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                  <p style={{ margin: 0 }}>{analytics?.totalRegistrations || 0} Total</p>
+                  <span style={{ fontSize: '0.8rem', color: '#28a745' }}>{analytics?.confirmedRegistrations || 0} Confirmed</span>
+                </div>
+              </div>
+              <div className="detail-item">
+                <label>Attendance Status</label>
+                <p>{analytics?.attendance || 0} Checked In</p>
+              </div>
+              <div className="detail-item">
+                <label>Total Revenue</label>
+                <p style={{ color: '#28a745', fontWeight: 'bold' }}>
+                  ₹{analytics?.revenue?.toLocaleString() || 0}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          {event.description && (
+            <div className="description">
+              <label>Description</label>
+              <p>{event.description}</p>
+            </div>
+          )}
         </div>
       )}
 
@@ -351,8 +379,9 @@ const OrganizerEventDetails = () => {
               <div className="table-header">
                 <span>Name</span>
                 <span>Email</span>
-                <span>Phone</span>
-                <span>Status</span>
+                <span>Reg Date</span>
+                <span>Payment</span>
+                <span>Team</span>
                 <span>Attended</span>
                 <span>Actions</span>
               </div>
@@ -362,9 +391,12 @@ const OrganizerEventDetails = () => {
                     {reg.userId?.firstName} {reg.userId?.lastName}
                   </span>
                   <span>{reg.userId?.email}</span>
-                  <span>{reg.userId?.contactNumber || '-'}</span>
+                  <span>{new Date(reg.createdAt).toLocaleDateString()}</span>
                   <span>
-                    <span className={`status ${reg.status.toLowerCase()}`}>{reg.status}</span>
+                    {reg.paymentAmount ? `₹${reg.paymentAmount}` : 'Free'}
+                  </span>
+                  <span>
+                    {reg.teamId ? reg.teamId.name || 'Yes' : '-'}
                   </span>
                   <span>
                     {reg.attended ? (

@@ -111,7 +111,7 @@ const getTrendingEvents = async (req, res, next) => {
   try {
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
-    // Get registration counts in last 24h
+    // 1. Get events with registrations in the last 24h
     const trendingRegistrations = await Registration.aggregate([
       {
         $match: {
@@ -129,14 +129,28 @@ const getTrendingEvents = async (req, res, next) => {
       { $limit: 5 }
     ]);
 
-    const eventIds = trendingRegistrations.map(r => r._id);
+    let eventIds = trendingRegistrations.map(r => r._id);
     
+    // 2. If we have less than 5 trending events, pad with the most popular overall events
+    if (eventIds.length < 5) {
+      const fallbackEvents = await Event.find({
+        _id: { $nin: eventIds },
+        status: { $in: ['PUBLISHED', 'ONGOING'] }
+      })
+      .sort({ registrationCount: -1, viewCount: -1 })
+      .limit(5 - eventIds.length)
+      .select('_id');
+      
+      eventIds = [...eventIds, ...fallbackEvents.map(e => e._id)];
+    }
+    
+    // 3. Fetch the full event documents
     const events = await Event.find({
       _id: { $in: eventIds },
       status: { $in: ['PUBLISHED', 'ONGOING'] }
     }).populate('organizerId', 'name');
 
-    // Sort by trending order and process status
+    // Sort by our computed trending order and process status
     const now = new Date();
     // Convert current UTC time to IST (+5:30)
     const nowIST = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
