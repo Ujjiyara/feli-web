@@ -92,8 +92,10 @@ const getMyEvents = async (req, res, next) => {
       })
       .sort({ createdAt: -1 });
 
-    // Categorize events
+    // Categorize events using IST threshold
     const now = new Date();
+    const nowIST = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
+    
     const upcoming = [];
     const completed = [];
     const cancelled = [];
@@ -102,6 +104,9 @@ const getMyEvents = async (req, res, next) => {
       if (!reg.eventId) return;
       
       const event = reg.eventId;
+      const eventEndIST = new Date(event.endDate);
+      const isCompletedEvent = event.status === 'COMPLETED' || eventEndIST < nowIST;
+      
       const regData = {
         registrationId: reg._id,
         ticketId: reg.ticketId,
@@ -113,13 +118,13 @@ const getMyEvents = async (req, res, next) => {
           organizer: event.organizerId?.name,
           startDate: event.startDate,
           endDate: event.endDate,
-          status: event.status
+          status: isCompletedEvent && event.status !== 'CANCELLED' ? 'COMPLETED' : event.status
         }
       };
 
       if (reg.status === 'CANCELLED' || reg.status === 'REJECTED') {
         cancelled.push(regData);
-      } else if (event.endDate < now || event.status === 'COMPLETED') {
+      } else if (reg.status === 'ATTENDED' || eventEndIST < nowIST || event.status === 'COMPLETED') {
         completed.push(regData);
       } else {
         upcoming.push(regData);

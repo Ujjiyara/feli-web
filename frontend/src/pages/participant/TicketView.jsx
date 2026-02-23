@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { participantService } from '../../services';
 import { FiCalendar, FiMapPin, FiUser, FiDownload, FiArrowLeft } from 'react-icons/fi';
+import { formatDate, formatTime } from '../../utils/dateUtils';
 import toast from 'react-hot-toast';
 import './TicketView.css';
 
@@ -27,21 +28,7 @@ const TicketView = () => {
     }
   };
 
-  const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-IN', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
 
-  const formatTime = (date) => {
-    return new Date(date).toLocaleTimeString('en-IN', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
 
   const downloadTicket = () => {
     // Create a printable version
@@ -102,8 +89,8 @@ const TicketView = () => {
             <FiCalendar />
             <div>
               <strong>Date & Time</strong>
-              <p>{formatDate(ticket.event?.startDate)}</p>
-              <p>{formatTime(ticket.event?.startDate)} - {formatTime(ticket.event?.endDate)}</p>
+              <p>Start: {formatDate(ticket.event?.startDate)}, {formatTime(ticket.event?.startDate)}</p>
+              <p>End: {formatDate(ticket.event?.endDate)}, {formatTime(ticket.event?.endDate)}</p>
             </div>
           </div>
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { eventService } from '../../services';
 import { FiSearch, FiFilter, FiCalendar, FiUsers, FiDollarSign, FiTrendingUp, FiHeart } from 'react-icons/fi';
+import { formatDateShort as formatDate } from '../../utils/dateUtils';
 import toast from 'react-hot-toast';
 import './BrowseEvents.css';
 
@@ -92,13 +93,7 @@ const BrowseEvents = () => {
     setShowFilters(false);
   };
 
-  const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-IN', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
+
 
   return (
     <div className="browse-events">

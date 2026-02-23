@@ -223,9 +223,8 @@ export const adminService = {
     return response.data;
   },
 
-  // Reset organizer password
-  resetOrganizerPassword: async (organizerId) => {
-    const response = await api.post(`/admin/organizers/${organizerId}/reset-password`);
+  resetOrganizerPassword: async (organizerId, newPassword) => {
+    const response = await api.post(`/admin/organizers/${organizerId}/reset-password`, { newPassword });
     return response.data;
   },
 
@@ -236,8 +235,8 @@ export const adminService = {
   },
 
   // Process password reset request
-  processPasswordResetRequest: async (requestId, action, adminNote) => {
-    const response = await api.post(`/admin/password-reset-requests/${requestId}`, { action, adminNote });
+  processPasswordResetRequest: async (requestId, action, adminNote, newPassword) => {
+    const response = await api.post(`/admin/password-reset-requests/${requestId}`, { action, adminNote, newPassword });
     return response.data;
   }
 };

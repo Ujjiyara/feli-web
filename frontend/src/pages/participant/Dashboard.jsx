@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { participantService, eventService } from '../../services';
 import { FiCalendar, FiTag } from 'react-icons/fi';
+import { formatDateShort as formatDate } from '../../utils/dateUtils';
 import toast from 'react-hot-toast';
 import './Dashboard.css';
 
@@ -36,13 +37,7 @@ const ParticipantDashboard = () => {
     }
   };
 
-  const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-IN', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
+
 
   if (loading) {
     return (

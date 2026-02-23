@@ -12,9 +12,22 @@ const getDashboard = async (req, res, next) => {
     const organizerId = req.user._id;
 
     // Get all events
-    const events = await Event.find({ organizerId })
+    const rawEvents = await Event.find({ organizerId })
       .select('name type status startDate endDate registrationCount revenue')
       .sort({ createdAt: -1 });
+
+    const now = new Date();
+    // Convert current UTC time to IST (+5:30)
+    const nowIST = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
+    
+    const events = rawEvents.map(e => {
+      const eventData = e.toObject();
+      const eventEndIST = new Date(eventData.endDate);
+      if (eventEndIST < nowIST && eventData.status !== 'CANCELLED') {
+        eventData.status = 'COMPLETED';
+      }
+      return eventData;
+    });
 
     // Calculate overall analytics
     const completedEvents = events.filter(e => e.status === 'COMPLETED');
@@ -267,10 +280,21 @@ const getEventDetails = async (req, res, next) => {
     const attendedCount = registrations.filter(r => r.attendance?.checked).length;
     const revenue = registrations.reduce((sum, r) => sum + (r.paymentAmount || 0), 0);
 
+    // Determine dynamic status based on time
+    const now = new Date();
+    // Convert current UTC time to IST (+5:30)
+    const nowIST = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
+    
+    const eventData = event.toObject();
+    const eventEndIST = new Date(eventData.endDate);
+    if (eventEndIST < nowIST && eventData.status !== 'CANCELLED') {
+      eventData.status = 'COMPLETED';
+    }
+
     res.json({
       success: true,
       data: {
-        event,
+        event: eventData,
         analytics: {
           totalRegistrations: registrations.length,
           confirmedRegistrations: confirmedCount,

@@ -139,6 +139,7 @@ const deleteOrganizer = async (req, res, next) => {
  */
 const resetOrganizerPassword = async (req, res, next) => {
   try {
+    const { newPassword: customPassword } = req.body;
     const organizer = await Organizer.findById(req.params.id);
 
     if (!organizer) {
@@ -148,7 +149,7 @@ const resetOrganizerPassword = async (req, res, next) => {
       });
     }
 
-    const newPassword = generatePassword();
+    const newPassword = customPassword || generatePassword();
     organizer.password = newPassword;
     await organizer.save();
 
@@ -228,7 +229,7 @@ const getPasswordResetRequests = async (req, res, next) => {
 const processPasswordResetRequest = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { action, adminNote } = req.body; // action: 'approve' or 'reject'
+    const { action, adminNote, newPassword: customPassword } = req.body; // action: 'approve' or 'reject'
 
     const PasswordResetRequest = require('../models/PasswordResetRequest');
     const request = await PasswordResetRequest.findById(id);
@@ -248,8 +249,8 @@ const processPasswordResetRequest = async (req, res, next) => {
     }
 
     if (action === 'approve') {
-      // Generate new password and update organizer
-      const newPassword = generatePassword();
+      // Use custom password or generate a new one
+      const newPassword = customPassword || generatePassword();
       const organizer = await Organizer.findById(request.organizerId);
       
       if (!organizer) {

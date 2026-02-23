@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { organizerService } from '../../services';
 import { FiCalendar, FiUsers, FiTrendingUp, FiPlus, FiEye, FiEdit } from 'react-icons/fi';
+import { formatDateShort as formatDate } from '../../utils/dateUtils';
 import toast from 'react-hot-toast';
 import './OrganizerDashboard.css';
 
@@ -38,13 +39,7 @@ const OrganizerDashboard = () => {
     }
   };
 
-  const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-IN', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
+
 
   if (loading) {
     return (

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FiCheck, FiX, FiImage, FiDollarSign, FiUser, FiCalendar } from 'react-icons/fi';
+import { formatDateTime as formatDate } from '../../utils/dateUtils';
 import toast from 'react-hot-toast';
 import api from '../../services/api';
 import './PaymentApprovals.css';
@@ -57,15 +58,7 @@ const PaymentApprovals = () => {
     }
   };
 
-  const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-IN', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+
 
   if (loading) {
     return (
