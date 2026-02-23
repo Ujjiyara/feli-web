@@ -1,0 +1,53 @@
+--- Starting Rigorous API E2E Verification ---
+
+-> [POST] /auth/login
+<- [200] /auth/login
+✅ PASS: Admin Login
+
+-> [POST] /admin/organizers
+<- [201] /admin/organizers
+✅ PASS: Admin Creates Organizer
+
+-> [POST] /auth/login
+<- [200] /auth/login
+✅ PASS: Organizer Login
+
+-> [POST] /organizer/events
+<- [201] /organizer/events
+✅ PASS: Organizer Creates Event
+
+-> [POST] /organizer/events/699ae64e3b25fae9ec3b66ad/publish
+<- [200] /organizer/events/699ae64e3b25fae9ec3b66ad/publish
+✅ PASS: Organizer Publishes Event
+
+-> [POST] /auth/register
+<- [201] /auth/register
+✅ PASS: Participant Registration
+
+-> [GET] /events
+<- [200] /events
+✅ PASS: Participant Lists Published Events
+
+-> [POST] /events/699ae64e3b25fae9ec3b66ad/register
+<- [201] /events/699ae64e3b25fae9ec3b66ad/register
+✅ PASS: Participant Registers for Event
+
+-> [GET] /participant/my-events
+<- [200] /participant/my-events
+✅ PASS: Participant Fetches My Events
+
+-> [GET] /organizer/events/699ae64e3b25fae9ec3b66ad/participants
+<- [200] /organizer/events/699ae64e3b25fae9ec3b66ad/participants
+✅ PASS: Organizer Lists Participants For Event
+
+-> [GET] /participant/organizers
+<- [200] /participant/organizers
+
+-> [GET] /participant/organizers/6998c2494b5fe95f24ab8508
+<- [200] /participant/organizers/6998c2494b5fe95f24ab8508
+✅ PASS: Participant Views Organizer Details
+
+--- E2E Verification Complete ---
+Passed: 11
+Failed: 0
+Total:  11
