@@ -8,6 +8,7 @@ router.get('/profile', authenticate, authorize('participant'), participantContro
 router.put('/profile', authenticate, authorize('participant'), participantController.updateProfile);
 router.post('/onboarding', authenticate, authorize('participant'), participantController.completeOnboarding);
 router.get('/my-events', authenticate, authorize('participant'), participantController.getMyEvents);
+router.get('/recommended-events', authenticate, authorize('participant'), participantController.getRecommendedEvents);
 router.get('/tickets/:id', authenticate, authorize('participant'), participantController.getTicket);
 
 // Organizer listing (with optional auth for follow status)

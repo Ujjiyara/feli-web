@@ -154,6 +154,29 @@
   color: var(--text-dark);
 }
 
+/* Recommended for You Section */
+.recommended-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.recommended-card {
+  position: relative;
+}
+
+.recommend-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  margin: 0 1.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #a855f7, #6366f1);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  border: 2px solid #000;
+}
+
 /* My Events Section */
 .my-events-section {
   animation: slideUp 0.5s ease-out 0.2s backwards;

@@ -64,6 +64,12 @@ export const participantService = {
     return response.data;
   },
 
+  // Get recommended events based on user preferences
+  getRecommendedEvents: async () => {
+    const response = await api.get('/participant/recommended-events');
+    return response.data;
+  },
+
   // Get ticket
   getTicket: async (registrationId) => {
     const response = await api.get(`/participant/tickets/${registrationId}`);

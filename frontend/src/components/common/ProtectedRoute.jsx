@@ -45,6 +45,10 @@ export const PublicRoute = ({ children }) => {
   }
 
   if (isAuthenticated) {
+    // Send new participants to onboarding first
+    if (user?.role === 'participant' && !user?.onboardingCompleted) {
+      return <Navigate to="/onboarding" replace />;
+    }
     const dashboardRoutes = {
       participant: '/dashboard',
       organizer: '/organizer/dashboard',

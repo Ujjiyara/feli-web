@@ -51,7 +51,7 @@ const Register = () => {
 
       if (result.success) {
         toast.success('Registration successful!');
-        navigate('/dashboard');
+        navigate('/onboarding');
       } else {
         toast.error(result.message || 'Registration failed');
       }

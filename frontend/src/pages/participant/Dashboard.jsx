@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { participantService, eventService } from '../../services';
-import { FiCalendar, FiTag } from 'react-icons/fi';
+import { FiCalendar, FiTag, FiStar } from 'react-icons/fi';
 import { formatDateShort as formatDate } from '../../utils/dateUtils';
 import toast from 'react-hot-toast';
 import './Dashboard.css';
@@ -9,6 +9,7 @@ import './Dashboard.css';
 const ParticipantDashboard = () => {
   const [events, setEvents] = useState({ upcoming: [], completed: [], cancelled: [] });
   const [trending, setTrending] = useState([]);
+  const [recommended, setRecommended] = useState([]);
   const [activeTab, setActiveTab] = useState('upcoming');
   const [typeFilter, setTypeFilter] = useState('ALL');
   const [loading, setLoading] = useState(true);
@@ -19,9 +20,10 @@ const ParticipantDashboard = () => {
 
   const fetchData = async () => {
     try {
-      const [myEventsRes, trendingRes] = await Promise.all([
+      const [myEventsRes, trendingRes, recommendedRes] = await Promise.all([
         participantService.getMyEvents(),
-        eventService.getTrendingEvents()
+        eventService.getTrendingEvents(),
+        participantService.getRecommendedEvents()
       ]);
 
       if (myEventsRes.success) {
@@ -29,6 +31,9 @@ const ParticipantDashboard = () => {
       }
       if (trendingRes.success) {
         setTrending(trendingRes.data.events || []);
+      }
+      if (recommendedRes.success) {
+        setRecommended(recommendedRes.data.events || []);
       }
     } catch {
       toast.error('Failed to load dashboard');
@@ -70,6 +75,31 @@ const ParticipantDashboard = () => {
             {trending.map((event) => (
               <Link to={`/events/${event._id}`} key={event._id} className="trending-card">
                 <div className="trending-type">{event.type}</div>
+                <h3>{event.name}</h3>
+                <p className="trending-org">{event.organizerId?.name}</p>
+                <div className="trending-date">
+                  <FiCalendar />
+                  {formatDate(event.startDate)}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Recommended for You */}
+      {recommended.length > 0 && (
+        <section className="trending-section recommended-section">
+          <h2><FiStar /> Recommended for You</h2>
+          <div className="trending-scroll">
+            {recommended.map((event) => (
+              <Link to={`/events/${event._id}`} key={event._id} className="trending-card recommended-card">
+                <div className="trending-type">{event.type}</div>
+                {event._recommendScore > 0 && (
+                  <span className="recommend-badge">
+                    {event._recommendScore >= 50 ? '💜 Following' : '✨ Matches'}
+                  </span>
+                )}
                 <h3>{event.name}</h3>
                 <p className="trending-org">{event.organizerId?.name}</p>
                 <div className="trending-date">
