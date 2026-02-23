@@ -92,16 +92,14 @@ const updateEvent = async (req, res, next) => {
       });
     }
 
-    // Editing rules based on status
-    const restrictedFields = ['name', 'type', 'customFormFields', 'merchandiseItems'];
+    const restrictedFields = ['name', 'type', 'customFormFields'];
     
     if (event.status !== 'DRAFT') {
       for (const field of restrictedFields) {
         if (req.body[field] !== undefined) {
-          return res.status(400).json({
-            success: false,
-            message: `Cannot modify ${field} after event is published`
-          });
+          // Instead of crashing because the frontend sends a full PUT payload,
+          // simply strip the restricted fields out so they cannot be modified.
+          delete req.body[field];
         }
       }
     }
@@ -127,7 +125,7 @@ const updateEvent = async (req, res, next) => {
       'tags', 'customFormFields', 'merchandiseItems', 'coverImage'
     ];
 
-    const publishedAllowed = ['description', 'registrationDeadline', 'registrationLimit'];
+    const publishedAllowed = ['description', 'registrationDeadline', 'registrationLimit', 'merchandiseItems'];
 
     allowedUpdates.forEach(field => {
       if (req.body[field] !== undefined) {
@@ -698,15 +696,9 @@ const updatePaymentStatus = async (req, res, next) => {
       registration.ticketId = ticketId;
       registration.qrCode = qrCode;
 
-      // 3. Decrement stock & add revenue to event
+      // 3. Add revenue to event (Stock was already decremented at purchase time)
       const event = await Event.findById(registration.eventId._id);
       if (event) {
-        for (const item of registration.merchandiseOrder.items) {
-          const merchItem = event.merchandiseItems.id(item.itemId);
-          if (merchItem) {
-            merchItem.stock -= item.quantity;
-          }
-        }
         event.registrationCount += 1;
         event.revenue += (registration.merchandiseOrder.totalAmount || 0);
         await event.save();
@@ -724,8 +716,23 @@ const updatePaymentStatus = async (req, res, next) => {
     } else {
       registration.status = 'REJECTED';
       registration.paymentStatus = 'FAILED';
+      
+      // Restore the reserved stock since the order was rejected
+      const event = await Event.findById(registration.eventId._id);
+      if (event) {
+        for (const item of registration.merchandiseOrder.items) {
+          const merchItem = event.merchandiseItems.id(item.itemId);
+          if (merchItem) {
+            merchItem.stock += item.quantity;
+          }
+        }
+        event.markModified('merchandiseItems');
+        await event.save();
+      }
     }
 
+    // Explicitly tell Mongoose that this nested object has changed
+    registration.markModified('merchandiseOrder');
     await registration.save();
 
     res.json({

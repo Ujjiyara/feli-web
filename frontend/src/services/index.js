@@ -92,6 +92,12 @@ export const participantService = {
   toggleFollowOrganizer: async (organizerId) => {
     const response = await api.post(`/participant/organizers/${organizerId}/follow`);
     return response.data;
+  },
+
+  // Upload payment proof for merchandise
+  uploadPaymentProof: async (registrationId, paymentProof) => {
+    const response = await api.post('/participant/payment-proof', { registrationId, paymentProof });
+    return response.data;
   }
 };
 

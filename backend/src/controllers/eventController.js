@@ -405,8 +405,16 @@ const purchaseMerchandise = async (req, res, next) => {
       totalAmount += merchItem.price * item.quantity;
     }
 
+    // Decrement stock immediately (reservation)
+    for (const item of items) {
+      const merchItem = event.merchandiseItems.id(item.itemId);
+      merchItem.stock -= item.quantity;
+    }
+    event.markModified('merchandiseItems');
+    await event.save();
+
     // Create registration with order in PENDING state
-    // QR code, stock update, and ticketId will be generated upon Organizer payment approval
+    // QR code, ticketId, and email will be generated upon Organizer payment approval
     const registration = await Registration.create({
       eventId: event._id,
       participantId: req.user._id,
@@ -424,7 +432,7 @@ const purchaseMerchandise = async (req, res, next) => {
 
     res.status(201).json({
       success: true,
-      message: 'Order placed. Please upload payment proof to confirm.',
+      message: 'Order placed. Awaiting organizer payment approval.',
       data: {
         registration: {
           id: registration._id,

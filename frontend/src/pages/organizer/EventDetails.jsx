@@ -229,15 +229,15 @@ const OrganizerEventDetails = () => {
           <span className={`status-badge ${event.status.toLowerCase()}`}>{event.status}</span>
         </div>
         <div className="event-actions">
+          {['DRAFT', 'PUBLISHED'].includes(event.status) && (
+            <button className="action-btn edit" onClick={() => navigate(`/organizer/events/${id}/edit`)}>
+              <FiEdit /> Edit
+            </button>
+          )}
           {event.status === 'DRAFT' && (
-            <>
-              <button className="action-btn edit" onClick={() => navigate(`/organizer/events/${id}/edit`)}>
-                <FiEdit /> Edit
-              </button>
-              <button className="action-btn publish" onClick={() => handleStatusChange('PUBLISHED')}>
-                Publish Event
-              </button>
-            </>
+            <button className="action-btn publish" onClick={() => handleStatusChange('PUBLISHED')}>
+              Publish Event
+            </button>
           )}
           {event.status === 'PUBLISHED' && (
             <>
