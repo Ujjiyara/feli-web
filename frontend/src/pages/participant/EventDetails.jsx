@@ -18,6 +18,8 @@ const EventDetails = () => {
   const [registering, setRegistering] = useState(false);
   const [formResponses, setFormResponses] = useState({});
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
+  const [showMerchModal, setShowMerchModal] = useState(false);
+  const [selectedMerch, setSelectedMerch] = useState({}); // { itemId: { quantity, size, color, price } }
 
   useEffect(() => {
     fetchEvent();
@@ -46,11 +48,45 @@ const EventDetails = () => {
   };
 
   const handleRegister = async () => {
+    if (event.type === 'MERCHANDISE') {
+      setShowMerchModal(true);
+      return;
+    }
     if (event.customFormFields && event.customFormFields.length > 0) {
       setShowRegistrationModal(true);
       return;
     }
     await submitRegistration();
+  };
+
+  const submitMerchPurchase = async () => {
+    const items = Object.entries(selectedMerch)
+      .filter(([, data]) => data.quantity > 0)
+      .map(([itemId, data]) => ({
+        itemId,
+        quantity: data.quantity,
+        size: data.size,
+        color: data.color
+      }));
+
+    if (items.length === 0) {
+      toast.error('Please select at least one item');
+      return;
+    }
+
+    setRegistering(true);
+    try {
+      const response = await eventService.purchaseMerchandise(id, items);
+      if (response.success) {
+        toast.success(response.message || 'Order placed successfully!');
+        setShowMerchModal(false);
+        navigate(`/tickets/${response.data.registration.id}`);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Purchase failed');
+    } finally {
+      setRegistering(false);
+    }
   };
 
   const submitRegistration = async () => {
@@ -125,15 +161,24 @@ const EventDetails = () => {
 
           {event.type === 'MERCHANDISE' && event.merchandiseItems && (
             <section className="event-section">
-              <h2>Available Items</h2>
+              <h2>Available Merchandise</h2>
               <div className="merch-grid">
                 {event.merchandiseItems.map((item, index) => (
-                  <div key={index} className="merch-card">
-                    <h4>{item.name}</h4>
-                    {item.size && <p>Size: {item.size}</p>}
-                    {item.color && <p>Color: {item.color}</p>}
-                    <p className="merch-price">₹{item.price}</p>
-                    <p className="merch-stock">{item.stock} in stock</p>
+                  <div key={index} className="merch-card" style={{ border: '2px solid rgba(255,45,117,0.3)', padding: '1rem', borderRadius: '12px' }}>
+                    <h4 style={{ color: 'var(--hot-pink)', fontSize: '1.2rem', marginBottom: '0.5rem' }}>{item.name}</h4>
+                    <p className="merch-price" style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>₹{item.price}</p>
+                    <p className="merch-stock" style={{ color: item.stock > 0 ? 'var(--neon-cyan)' : 'gray' }}>
+                      {item.stock > 0 ? `${item.stock} in stock` : 'Out of stock'}
+                    </p>
+                    {(item.size || item.color) && (
+                      <div style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>
+                        {item.size && <p>Sizes: {item.size}</p>}
+                        {item.color && <p>Colors: {item.color}</p>}
+                      </div>
+                    )}
+                    {item.purchaseLimit > 1 && (
+                      <p style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>Max {item.purchaseLimit} per person</p>
+                    )}
                   </div>
                 ))}
               </div>
@@ -380,6 +425,131 @@ const EventDetails = () => {
                 <button type="submit" disabled={registering}>
                   {registering ? 'Submitting...' : 'Submit Registration'}
                 </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Merchandise Registration Modal */}
+      {showMerchModal && (
+        <div className="modal-overlay" onClick={() => setShowMerchModal(false)}>
+          <div className="modal-content" style={{ maxWidth: '600px' }} onClick={e => e.stopPropagation()}>
+            <h2>Select Merchandise</h2>
+            <p style={{ marginBottom: '1.5rem', color: 'rgba(255,255,255,0.7)' }}>
+              Choose the items and quantities you'd like to purchase.
+            </p>
+            <form onSubmit={(e) => { e.preventDefault(); submitMerchPurchase(); }}>
+              <div className="merch-selection-list" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '400px', overflowY: 'auto' }}>
+                {event.merchandiseItems.map((item) => {
+                  const selected = selectedMerch[item._id] || { quantity: 0, size: '', color: '' };
+                  const sizes = item.size ? item.size.split(',').map(s => s.trim()) : [];
+                  const colors = item.color ? item.color.split(',').map(c => c.trim()) : [];
+                  
+                  return (
+                    <div key={item._id} className="merch-selection-card" style={{ padding: '1rem', border: '1px solid currentColor', borderColor: selected.quantity > 0 ? 'var(--neon-cyan)' : 'rgba(255,255,255,0.1)', borderRadius: '8px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                          <h4 style={{ margin: 0 }}>{item.name}</h4>
+                          <p style={{ margin: '0.2rem 0 0 0', color: 'var(--hot-pink)' }}>₹{item.price}</p>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <button 
+                            type="button" 
+                            style={{ padding: '0.2rem 0.5rem', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '4px', color: 'white' }}
+                            onClick={() => {
+                              if (selected.quantity > 0) {
+                                setSelectedMerch(prev => ({
+                                  ...prev,
+                                  [item._id]: { ...selected, quantity: selected.quantity - 1 }
+                                }));
+                              }
+                            }}
+                          >-</button>
+                          <span style={{ minWidth: '20px', textAlign: 'center' }}>{selected.quantity}</span>
+                          <button 
+                            type="button" 
+                            style={{ padding: '0.2rem 0.5rem', background: 'var(--neon-cyan)', border: 'none', borderRadius: '4px', color: 'black' }}
+                            onClick={() => {
+                              if (selected.quantity < Math.min(item.stock, item.purchaseLimit || 1)) {
+                                setSelectedMerch(prev => ({
+                                  ...prev,
+                                  [item._id]: { 
+                                    ...selected, 
+                                    quantity: selected.quantity + 1,
+                                    size: selected.quantity === 0 && sizes.length > 0 ? sizes[0] : selected.size,
+                                    color: selected.quantity === 0 && colors.length > 0 ? colors[0] : selected.color
+                                  }
+                                }));
+                              } else {
+                                toast.error(`Maximum allowed: ${Math.min(item.stock, item.purchaseLimit || 1)}`);
+                              }
+                            }}
+                          >+</button>
+                        </div>
+                      </div>
+                      
+                      {selected.quantity > 0 && (sizes.length > 0 || colors.length > 0) && (
+                        <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
+                          {sizes.length > 0 && (
+                            <div className="form-group" style={{ flex: 1 }}>
+                              <label style={{ fontSize: '0.8rem' }}>Size</label>
+                              <select 
+                                value={selected.size}
+                                onChange={(e) => setSelectedMerch(prev => ({
+                                  ...prev,
+                                  [item._id]: { ...selected, size: e.target.value }
+                                }))}
+                                style={{ padding: '0.5rem' }}
+                                required
+                              >
+                                <option value="">Select size</option>
+                                {sizes.map(s => <option key={s} value={s}>{s}</option>)}
+                              </select>
+                            </div>
+                          )}
+                          {colors.length > 0 && (
+                            <div className="form-group" style={{ flex: 1 }}>
+                              <label style={{ fontSize: '0.8rem' }}>Color</label>
+                              <select 
+                                value={selected.color}
+                                onChange={(e) => setSelectedMerch(prev => ({
+                                  ...prev,
+                                  [item._id]: { ...selected, color: e.target.value }
+                                }))}
+                                style={{ padding: '0.5rem' }}
+                                required
+                              >
+                                <option value="">Select color</option>
+                                {colors.map(c => <option key={c} value={c}>{c}</option>)}
+                              </select>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' }}>Total Amount</span>
+                  <h3 style={{ margin: 0, color: 'var(--neon-cyan)', fontSize: '1.5rem' }}>
+                    ₹{Object.entries(selectedMerch).reduce((sum, [id, data]) => {
+                      const item = event.merchandiseItems.find(i => i._id === id);
+                      return sum + (data.quantity * (item?.price || 0));
+                    }, 0)}
+                  </h3>
+                </div>
+                <div className="modal-actions" style={{ marginTop: 0 }}>
+                  <button type="button" onClick={() => setShowMerchModal(false)} style={{ background: 'transparent' }}>
+                    Cancel
+                  </button>
+                  <button type="submit" disabled={registering || Object.values(selectedMerch).every(d => d.quantity === 0)} style={{ background: 'var(--neon-cyan)', color: 'black' }}>
+                    {registering ? 'Processing...' : 'Place Order'}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
