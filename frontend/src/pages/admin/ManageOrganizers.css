@@ -1,0 +1,451 @@
+/* Manage Organizers - Retro Disco Theme */
+.manage-organizers {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: calc(100vh - 80px);
+}
+
+.manage-organizers .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.manage-organizers .page-header h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--hot-pink);
+  text-shadow: var(--glow-pink);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.manage-organizers .page-header p {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg-surface);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  margin-bottom: 2rem;
+}
+
+.search-bar svg {
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+}
+
+.search-bar input {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--cream);
+  font-size: 1rem;
+  outline: none;
+}
+
+.search-bar input::placeholder {
+  color: var(--text-secondary);
+}
+
+/* Organizers Grid */
+.organizers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 1.5rem;
+}
+
+.org-card {
+  position: relative;
+  z-index: 1;
+  background: var(--cream);
+  color: var(--text-dark);
+  border: 3px solid #000;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-brutal);
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+
+.org-card:hover {
+  transform: translateY(-3px);
+}
+
+.org-card.disabled {
+  opacity: 0.65;
+}
+
+.org-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  border-bottom: 2px solid #eee;
+}
+
+.org-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--hot-pink);
+  color: var(--cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.25rem;
+  font-family: 'Space Grotesk', sans-serif;
+  flex-shrink: 0;
+}
+
+.org-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.org-info h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+  color: #111;
+  word-wrap: break-word;
+}
+
+.org-email {
+  font-size: 0.85rem;
+  color: #666;
+  display: block;
+  word-break: break-all;
+}
+
+.status-badge {
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.status-badge.active {
+  background: var(--success);
+  color: var(--text-dark);
+}
+
+.status-badge.inactive {
+  background: var(--danger);
+  color: var(--cream);
+}
+
+.org-meta {
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  border-bottom: 2px solid #eee;
+}
+
+.category-badge {
+  padding: 0.25rem 0.75rem;
+  background: var(--neon-cyan);
+  color: var(--text-dark);
+  border: 2px solid #000;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.meta-item {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.org-description {
+  padding: 0.75rem 1.25rem;
+  font-size: 0.9rem;
+  color: #555;
+  border-bottom: 2px solid #eee;
+  line-height: 1.4;
+}
+
+/* Actions */
+.org-actions {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0.75rem 1.25rem;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 2px solid #000;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 2px 2px 0 #000;
+}
+
+.action-btn.disable {
+  background: var(--warning);
+  color: var(--text-dark);
+}
+
+.action-btn.enable {
+  background: var(--success);
+  color: var(--text-dark);
+}
+
+.action-btn.reset {
+  background: var(--neon-cyan);
+  color: var(--text-dark);
+}
+
+.action-btn.delete {
+  background: var(--danger);
+  color: var(--cream);
+}
+
+/* Create Button */
+.create-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  background: var(--hot-pink);
+  color: var(--cream);
+  border: 3px solid #000;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.create-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 0 #000;
+}
+
+/* Credentials Modal */
+.credentials-modal {
+  text-align: center;
+}
+
+.cred-notice {
+  color: var(--warning);
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+.credential-row {
+  margin-bottom: 1.25rem;
+  text-align: left;
+}
+
+.credential-row label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.cred-value {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--bg-darker);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.cred-value code {
+  flex: 1;
+  color: var(--neon-cyan);
+  font-size: 1rem;
+  font-family: 'Space Grotesk', monospace;
+  word-break: break-all;
+}
+
+.cred-value button {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: color 0.2s;
+}
+
+.cred-value button:hover {
+  color: var(--hot-pink);
+}
+
+.close-modal-btn {
+  margin-top: 1.5rem;
+  padding: 0.875rem 2.5rem;
+  background: var(--hot-pink);
+  color: var(--cream);
+  border: 3px solid #000;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.close-modal-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 0 #000;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1500;
+  padding: 1rem;
+}
+
+.modal-content {
+  background: var(--bg-surface);
+  border: 3px solid var(--hot-pink);
+  border-radius: var(--radius-xl);
+  max-width: 500px;
+  width: 100%;
+  padding: 2rem;
+  box-shadow: 0 0 40px rgba(255, 0, 153, 0.2);
+}
+
+.modal-content h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  color: var(--cream);
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group label {
+  display: block;
+  color: var(--cream);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.875rem;
+  background: var(--bg-darker);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--cream);
+  font-size: 0.95rem;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--neon-cyan);
+  outline: none;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.cancel-btn {
+  flex: 1;
+  padding: 0.875rem;
+  background: var(--bg-darker);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--cream);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.submit-btn {
+  flex: 1;
+  padding: 0.875rem;
+  background: var(--hot-pink);
+  border: 3px solid #000;
+  border-radius: var(--radius-md);
+  color: var(--cream);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 0 #000;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+  .manage-organizers {
+    padding: 1rem;
+  }
+  .organizers-grid {
+    grid-template-columns: 1fr;
+  }
+  .manage-organizers .page-header h1 {
+    font-size: 1.75rem;
+  }
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}

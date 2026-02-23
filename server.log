@@ -1,0 +1,31 @@
+[0;34m========================================[0m
+[0;34m  🎉 Felicity Event Management System[0m
+[0;34m========================================[0m
+[0;34mStarting both servers...[0m
+[1;33mBackend: http://localhost:5000[0m
+[1;33mFrontend: http://localhost:5173[0m
+
+
+> felicity-backend@1.0.0 dev
+> nodemon src/app.js
+
+[33m[nodemon] 3.1.11[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): *.*[39m
+[33m[nodemon] watching extensions: js,mjs,cjs,json[39m
+[32m[nodemon] starting `node src/app.js`[39m
+Server running on port 5000
+MongoDB Connected: ac-ll8eg8s-shard-00-01.iuvfusy.mongodb.net
+
+[0;32mBoth servers running![0m
+Press Ctrl+C to stop both servers
+
+> frontend@0.0.0 dev
+> vite
+
+6:17:24 PM [vite] (client) Re-optimizing dependencies because lockfile has changed
+
+  VITE v7.3.1  ready in 113 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose

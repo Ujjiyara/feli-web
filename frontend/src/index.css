@@ -1,0 +1,425 @@
+/* Felicity Event Management System - Retro Disco Theme */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Retro Disco Color Palette */
+  --bg-dark: #1a0b16;
+  --bg-darker: #120810;
+  --bg-surface: #2a1525;
+  
+  /* Accent Colors */
+  --hot-pink: #ff0099;
+  --hot-pink-light: #ff33ad;
+  --neon-cyan: #00f0ff;
+  --neon-cyan-light: #33f3ff;
+  --cream: #fffdd0;
+  --cream-dark: #f5f3c8;
+  --gold: #b8860b; /* Dark Golden Rod for better contrast */
+  --purple-deep: #4a0e4e;
+  
+  /* Semantic Colors */
+  --success: #00ff88;
+  --success-bg: rgba(0, 255, 136, 0.15);
+  --warning: #b8860b; /* Matching gold for consistency and contrast */
+  --warning-bg: rgba(184, 134, 11, 0.15);
+  --danger: #ff4466;
+  --danger-bg: rgba(255, 68, 102, 0.15);
+  --info: #00f0ff;
+  --info-bg: rgba(0, 240, 255, 0.15);
+  
+  /* Text Colors */
+  --text-primary: #fffdd0;
+  --text-secondary: rgba(255, 253, 208, 0.75);
+  --text-muted: rgba(255, 253, 208, 0.5);
+  --text-dark: #1a0b16;
+  
+  /* Border & Effects */
+  --border-color: #3d1f35;
+  --border-thick: 3px solid #000;
+  --glow-pink: 0 0 20px rgba(255, 0, 153, 0.5);
+  --glow-cyan: 0 0 20px rgba(0, 240, 255, 0.5);
+  --shadow-brutal: 4px 4px 0 #000;
+  --shadow-brutal-lg: 6px 6px 0 #000;
+  
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 200ms ease;
+  --transition-slow: 300ms ease;
+}
+
+/* Reset & Base */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: var(--bg-dark);
+  min-height: 100vh;
+  /* Dotted grid background pattern */
+  background-image: 
+    radial-gradient(circle at center, rgba(255, 0, 153, 0.03) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+h1 { font-size: clamp(2rem, 5vw, 3rem); }
+h2 { font-size: clamp(1.5rem, 4vw, 2.25rem); }
+h3 { font-size: clamp(1.25rem, 3vw, 1.5rem); }
+h4 { font-size: 1.125rem; }
+
+a {
+  color: var(--neon-cyan);
+  text-decoration: none;
+  transition: color var(--transition-base);
+}
+
+a:hover {
+  color: var(--hot-pink);
+  text-shadow: var(--glow-pink);
+}
+
+/* Buttons - Neo-Brutalist Style */
+button {
+  font-family: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: var(--radius-md);
+  border: 3px solid #000;
+  transition: all var(--transition-fast);
+}
+
+.btn-primary {
+  background: var(--hot-pink);
+  color: var(--cream);
+  box-shadow: var(--shadow-brutal);
+}
+
+.btn-primary:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #000;
+}
+
+.btn-primary:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 #000;
+}
+
+.btn-secondary {
+  background: var(--neon-cyan);
+  color: var(--text-dark);
+  box-shadow: var(--shadow-brutal);
+}
+
+.btn-secondary:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #000;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--cream);
+  border: 2px solid var(--cream);
+}
+
+.btn-ghost:hover {
+  background: var(--cream);
+  color: var(--text-dark);
+}
+
+/* Form Elements */
+input, select, textarea {
+  font-family: inherit;
+  font-size: 1rem;
+  background: #ffffff;
+  color: #1a0b16;
+  border: 3px solid #000;
+  border-radius: var(--radius-md);
+  outline: none;
+}
+
+input:focus, select:focus, textarea:focus {
+  box-shadow: var(--shadow-brutal), var(--glow-cyan);
+}
+
+input::placeholder, textarea::placeholder {
+  color: #999999;
+  opacity: 1;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-darker);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--hot-pink);
+  border: 2px solid var(--bg-darker);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-cyan);
+}
+
+/* Layout */
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  padding-top: 80px;
+}
+
+/* Cards - Neo-Brutalist */
+.card, [class*="-card"] {
+  position: relative;
+  z-index: 5;
+  background: var(--cream);
+  color: var(--text-dark);
+  border: 3px solid #000;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-brutal);
+  overflow: hidden;
+  transition: all var(--transition-fast);
+}
+
+.card:hover, [class*="-card"]:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-brutal-lg);
+  z-index: 6;
+}
+
+.card-header {
+  background: var(--hot-pink);
+  color: var(--cream);
+  padding: 1rem 1.5rem;
+  border-bottom: 3px solid #000;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.card-header.cyan {
+  background: var(--neon-cyan);
+  color: var(--text-dark);
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.loading-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  background: var(--bg-dark);
+}
+
+.loading-screen p {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--hot-pink);
+  text-shadow: 2px 2px 0px #000;
+  letter-spacing: 0.1em;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid var(--border-color);
+  border-top-color: var(--hot-pink);
+  border-right-color: var(--neon-cyan);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Text Effects */
+.text-pink {
+  color: var(--hot-pink);
+}
+
+.text-cyan {
+  color: var(--neon-cyan);
+}
+
+.text-glow-pink {
+  color: var(--hot-pink);
+  text-shadow: var(--glow-pink);
+}
+
+.text-glow-cyan {
+  color: var(--neon-cyan);
+  text-shadow: var(--glow-cyan);
+}
+
+/* Badges - Sticker Style */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 2px solid #000;
+  border-radius: var(--radius-sm);
+  box-shadow: 2px 2px 0 #000;
+}
+
+.badge-pink {
+  background: var(--hot-pink);
+  color: var(--cream);
+}
+
+.badge-cyan {
+  background: var(--neon-cyan);
+  color: var(--text-dark);
+}
+
+.badge-success {
+  background: var(--success);
+  color: var(--text-dark);
+}
+
+.badge-warning {
+  background: var(--warning);
+  color: var(--text-dark);
+}
+
+.badge-danger {
+  background: var(--danger);
+  color: var(--cream);
+}
+
+/* Container */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Utility Classes */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: var(--shadow-brutal), 0 0 10px rgba(255, 0, 153, 0.3); }
+  50% { box-shadow: var(--shadow-brutal), 0 0 20px rgba(255, 0, 153, 0.6); }
+}
+
+@keyframes neonFlicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.8; }
+  94% { opacity: 1; }
+  96% { opacity: 0.9; }
+  97% { opacity: 1; }
+}
+
+.animate-fadeIn { animation: fadeIn 0.3s ease-out; }
+.animate-slideUp { animation: slideUp 0.4s ease-out; }
+.animate-glow { animation: glow 2s ease-in-out infinite; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1rem;
+  }
+  
+  .main-content {
+    padding-top: 70px;
+  }
+}
+
+/* Focus Visible */
+:focus-visible {
+  outline: 3px solid var(--neon-cyan);
+  outline-offset: 2px;
+}
+
+/* Selection */
+::selection {
+  background: var(--hot-pink);
+  color: var(--cream);
+}
