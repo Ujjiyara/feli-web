@@ -330,11 +330,81 @@ const uploadPaymentProof = async (req, res, next) => {
   }
 };
 
+/**
+ * Get recommended events based on user preferences
+ * Scoring: +50 for followed organizer, +10 per matching interest tag
+ */
+const getRecommendedEvents = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id).select('interests followedOrganizers participantType');
+    
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const followedIds = (user.followedOrganizers || []).map(id => id.toString());
+    const interests = (user.interests || []).map(i => i.toLowerCase());
+
+    // Get all upcoming/ongoing published events
+    const now = new Date();
+    const events = await Event.find({
+      status: { $in: ['PUBLISHED', 'ONGOING'] },
+      endDate: { $gte: now }
+    })
+      .populate('organizerId', 'name category')
+      .lean();
+
+    // Score and sort
+    const scored = events.map(event => {
+      let score = 0;
+
+      // +50 if organizer is followed
+      if (event.organizerId && followedIds.includes(event.organizerId._id.toString())) {
+        score += 50;
+      }
+
+      // +10 per matching tag
+      if (event.tags && interests.length > 0) {
+        const eventTags = event.tags.map(t => t.toLowerCase());
+        interests.forEach(interest => {
+          if (eventTags.some(tag => tag.includes(interest) || interest.includes(tag))) {
+            score += 10;
+          }
+        });
+      }
+
+      // +5 if organizer category matches any interest
+      if (event.organizerId?.category && interests.includes(event.organizerId.category.toLowerCase())) {
+        score += 5;
+      }
+
+      return { ...event, _recommendScore: score };
+    });
+
+    // Sort by score descending, then by startDate ascending as tiebreaker
+    scored.sort((a, b) => {
+      if (b._recommendScore !== a._recommendScore) return b._recommendScore - a._recommendScore;
+      return new Date(a.startDate) - new Date(b.startDate);
+    });
+
+    // Return top 10
+    const recommended = scored.slice(0, 10);
+
+    res.json({
+      success: true,
+      data: { events: recommended }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getProfile,
   updateProfile,
   completeOnboarding,
   getMyEvents,
+  getRecommendedEvents,
   getOrganizers,
   getOrganizerById,
   toggleFollowOrganizer,

@@ -173,12 +173,13 @@
 
 /* Organizers Grid */
 .onboarding-page .organizers-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
   margin-bottom: 1.5rem;
-  max-height: 350px;
+  max-height: 400px;
   overflow-y: auto;
+  padding-right: 0.5rem;
 }
 
 .onboarding-page .organizer-card {
@@ -195,6 +196,7 @@
 
 .onboarding-page .organizer-card:hover {
   border-color: rgba(0,255,255,0.3);
+  transform: translateY(-2px);
 }
 
 .onboarding-page .organizer-card.followed {
