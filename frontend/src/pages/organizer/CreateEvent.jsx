@@ -333,36 +333,79 @@ const CreateEvent = () => {
             <p className="section-hint">Add items available for purchase</p>
             
             {eventData.merchandiseItems.map((item, index) => (
-              <div key={index} className="merch-item-row">
-                <input
-                  type="text"
-                  placeholder="Item name"
-                  value={item.name}
-                  onChange={(e) => updateMerchItem(index, { name: e.target.value })}
-                />
-                <input
-                  type="number"
-                  placeholder="Price"
-                  value={item.price}
-                  onChange={(e) => updateMerchItem(index, { price: Number(e.target.value) })}
-                  min={0}
-                />
-                <input
-                  type="number"
-                  placeholder="Stock"
-                  value={item.stock}
-                  onChange={(e) => updateMerchItem(index, { stock: Number(e.target.value) })}
-                  min={0}
-                />
-                <input
-                  type="text"
-                  placeholder="Size (optional)"
-                  value={item.size}
-                  onChange={(e) => updateMerchItem(index, { size: e.target.value })}
-                />
-                <button type="button" className="remove-btn" onClick={() => removeMerchItem(index)}>
-                  <FiTrash2 />
-                </button>
+              <div key={index} className="merch-item-card" style={{ padding: '15px', border: '1px solid var(--neon-cyan)', borderRadius: '8px', marginBottom: '15px', background: 'rgba(0, 255, 255, 0.02)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                  <h4 style={{ margin: 0, color: 'var(--neon-cyan)' }}>Item {index + 1}</h4>
+                  <button type="button" className="remove-btn" onClick={() => removeMerchItem(index)}>
+                    <FiTrash2 /> Remove
+                  </button>
+                </div>
+                
+                <div className="form-row">
+                  <div className="form-group" style={{ flex: 2 }}>
+                    <label>Item Name *</label>
+                    <input
+                      type="text"
+                      placeholder="e.g., Felicity '26 T-Shirt"
+                      value={item.name}
+                      onChange={(e) => updateMerchItem(index, { name: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Price (₹) *</label>
+                    <input
+                      type="number"
+                      placeholder="0"
+                      value={item.price}
+                      onChange={(e) => updateMerchItem(index, { price: Number(e.target.value) })}
+                      min={0}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Total Stock *</label>
+                    <input
+                      type="number"
+                      placeholder="0"
+                      value={item.stock}
+                      onChange={(e) => updateMerchItem(index, { stock: Number(e.target.value) })}
+                      min={0}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Max per User</label>
+                    <input
+                      type="number"
+                      placeholder="1"
+                      value={item.purchaseLimit || 1}
+                      onChange={(e) => updateMerchItem(index, { purchaseLimit: Number(e.target.value) })}
+                      min={1}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Available Sizes (comma separated)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g., S, M, L, XL"
+                      value={item.size || ''}
+                      onChange={(e) => updateMerchItem(index, { size: e.target.value })}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Available Colors (comma separated)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g., Black, White, Navy"
+                      value={item.color || ''}
+                      onChange={(e) => updateMerchItem(index, { color: e.target.value })}
+                    />
+                  </div>
+                </div>
               </div>
             ))}
             

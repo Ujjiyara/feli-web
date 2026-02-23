@@ -366,7 +366,7 @@ const purchaseMerchandise = async (req, res, next) => {
     }
 
     // Validate items and calculate total
-    let totalAmount = 0;
+    let totalAmount = event.registrationFee || 0; // Include base event registration fee
     const orderItems = [];
 
     for (const item of items) {
