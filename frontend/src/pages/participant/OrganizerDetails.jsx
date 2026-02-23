@@ -11,7 +11,8 @@ const OrganizerDetails = () => {
   const { id } = useParams();
   const { user, updateUser } = useAuth();
   const [organizer, setOrganizer] = useState(null);
-  const [events, setEvents] = useState([]);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [pastEvents, setPastEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,9 +26,8 @@ const OrganizerDetails = () => {
         setOrganizer(response.data.organizer);
         
         // The backend returns upcomingEvents and pastEvents separately
-        const upcoming = response.data.upcomingEvents || [];
-        const past = response.data.pastEvents || [];
-        setEvents([...upcoming, ...past]);
+        setUpcomingEvents(response.data.upcomingEvents || []);
+        setPastEvents(response.data.pastEvents || []);
       }
     } catch (err) {
       console.error(err);
@@ -41,7 +41,7 @@ const OrganizerDetails = () => {
     try {
       const response = await participantService.toggleFollowOrganizer(id);
       if (response.success) {
-        const isFollowing = response.data.following;
+        const isFollowing = response.data.isFollowing;
         toast.success(isFollowing ? 'Now following!' : 'Unfollowed');
         
         const currentFollowed = user.followedOrganizers || [];
@@ -92,7 +92,7 @@ const OrganizerDetails = () => {
           <div className="org-stats-row">
             <div className="stat">
               <FiCalendar />
-              <span>{events.length} Events</span>
+              <span>{upcomingEvents.length + pastEvents.length} Events</span>
             </div>
             <div className="stat">
               <FiUsers />
@@ -120,27 +120,58 @@ const OrganizerDetails = () => {
         </div>
       )}
 
-      {/* Events Section */}
+      {/* Events Sections */}
       <div className="events-section">
-        <h2>Events by {organizer.name}</h2>
-        
-        {events.length === 0 ? (
-          <div className="no-events">
-            <p>No upcoming events at the moment</p>
+        <h2 style={{ marginBottom: '1.5rem', color: 'var(--neon-cyan)' }}>Upcoming Events</h2>
+        {upcomingEvents.length === 0 ? (
+          <div className="no-events" style={{ background: 'rgba(255,255,255,0.02)', padding: '2rem', borderRadius: '12px' }}>
+            <p style={{ color: 'rgba(255,255,255,0.6)' }}>No upcoming events scheduled</p>
           </div>
         ) : (
-          <div className="events-grid">
-            {events.map((event) => (
-              <Link key={event._id} to={`/events/${event._id}`} className="event-card-mini">
-                <span className={`event-type-mini ${event.type.toLowerCase()}`}>{event.type}</span>
-                <h4>{event.name}</h4>
-                <p className="event-date">
-                  <FiCalendar /> {formatDate(event.startDate)}
-                </p>
-                {event.registrationFee > 0 && (
-                  <p className="event-fee">₹{event.registrationFee}</p>
-                )}
+          <div className="events-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+            {upcomingEvents.map((event) => (
+              <Link key={event._id} to={`/events/${event._id}`} className="event-card-mini" style={{ display: 'flex', flexDirection: 'column', padding: '1.25rem', border: '1px solid rgba(255,45,117,0.3)', borderRadius: '12px', background: 'rgba(0,0,0,0.5)', textDecoration: 'none' }}>
+                <span className={`event-type-mini ${event.type.toLowerCase()}`} style={{ alignSelf: 'flex-start', fontSize: '0.7rem', padding: '0.2rem 0.6rem', borderRadius: '4px', background: event.type === 'MERCHANDISE' ? 'var(--hot-pink)' : 'var(--neon-cyan)', color: 'black', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                  {event.type}
+                </span>
+                <h4 style={{ color: 'white', margin: '0.5rem 0', fontSize: '1.2rem' }}>{event.name}</h4>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'auto', paddingTop: '1rem', color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem' }}>
+                  <p style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', margin: 0 }}>
+                    <FiCalendar /> {formatDate(event.startDate)}
+                  </p>
+                  {event.registrationFee > 0 && (
+                    <p style={{ color: 'var(--neon-cyan)', margin: 0, fontWeight: 'bold' }}>₹{event.registrationFee}</p>
+                  )}
+                </div>
               </Link>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="events-section" style={{ marginTop: '3rem' }}>
+        <h2 style={{ marginBottom: '1.5rem', color: 'rgba(255,255,255,0.7)' }}>Past Events</h2>
+        {pastEvents.length === 0 ? (
+          <div className="no-events" style={{ background: 'rgba(255,255,255,0.02)', padding: '2rem', borderRadius: '12px' }}>
+            <p style={{ color: 'rgba(255,255,255,0.4)' }}>No past events</p>
+          </div>
+        ) : (
+          <div className="events-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+            {pastEvents.map((event) => (
+              <div key={event._id} className="event-card-mini" style={{ display: 'flex', flexDirection: 'column', padding: '1.25rem', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', background: 'rgba(0,0,0,0.3)', opacity: 0.7 }}>
+                <span className={`event-type-mini ${event.type.toLowerCase()}`} style={{ alignSelf: 'flex-start', fontSize: '0.7rem', padding: '0.2rem 0.6rem', borderRadius: '4px', background: 'rgba(255,255,255,0.2)', color: 'white', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                  {event.type}
+                </span>
+                <h4 style={{ color: 'white', margin: '0.5rem 0', fontSize: '1.2rem' }}>{event.name}</h4>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'auto', paddingTop: '1rem', color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem' }}>
+                  <p style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', margin: 0 }}>
+                    <FiCalendar /> {formatDate(event.endDate)}
+                  </p>
+                  {event.registrationFee > 0 && (
+                    <p style={{ margin: 0 }}>₹{event.registrationFee}</p>
+                  )}
+                </div>
+              </div>
             ))}
           </div>
         )}

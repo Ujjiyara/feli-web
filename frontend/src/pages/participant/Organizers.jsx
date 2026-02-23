@@ -32,7 +32,7 @@ const Organizers = () => {
     try {
       const response = await participantService.toggleFollowOrganizer(organizerId);
       if (response.success) {
-        const isFollowing = response.data.following;
+        const isFollowing = response.data.isFollowing;
         toast.success(isFollowing ? 'Now following!' : 'Unfollowed');
         
         // Update local user state
