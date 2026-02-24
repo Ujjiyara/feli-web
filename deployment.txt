@@ -1,58 +1,87 @@
-Felicity Event Management Platform - Deployment Guide
+Felicity Event Management Platform — Deployment Information
+============================================================
 
-This project is a full-stack MERN application (MongoDB, Express.js, React, Node.js). Follow these steps to properly deploy it for production.
+Live URLs
+---------
+Frontend  : https://feli-web.vercel.app
+Backend   : https://felicity-backend-q0e3.onrender.com
+Database  : MongoDB Atlas (M0 Free Cluster)
 
 ---
+
+Local Development (Quick Start)
+-------------------------------
+A convenience script `script.sh` is provided in the project root for local development.
+
+Usage:
+  ./script.sh setup       # Install all dependencies (backend + frontend)
+  ./script.sh seed        # Seed the admin account into the database
+  ./script.sh backend     # Start only the backend server (port 5000)
+  ./script.sh frontend    # Start only the frontend dev server (port 5173)
+  ./script.sh both        # Start both backend and frontend concurrently
+
+Alternatively, you can start each manually:
+
+  Backend:
+    cd backend
+    cp .env.example .env   (configure your environment variables)
+    npm install
+    npm run seed:admin
+    npm run dev
+
+  Frontend:
+    cd frontend
+    npm install
+    npm run dev
+
+---
+
+Production Deployment Steps
+----------------------------
 
 ### Step 1: Database (MongoDB Atlas)
 
-1. Create a free account at [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
+1. Create a free account at https://www.mongodb.com/cloud/atlas
 2. Build a new cluster (M0 Free Tier is sufficient).
 3. Under "Database Access", create a new database user with a secure password.
-4. Under "Network Access", add `0.0.0.0/0` to allow connections from anywhere (required for most PaaS deployments).
-5. Click "Connect", choose "Drivers", and copy your connection string. It will look like: 
-   `mongodb+srv://<username>:<password>@cluster.mongodb.net/felicity?retryWrites=true&w=majority`
-
----
+4. Under "Network Access", add 0.0.0.0/0 to allow connections from anywhere.
+5. Click "Connect" → "Drivers" and copy your connection string:
+   mongodb+srv://<username>:<password>@cluster.mongodb.net/felicity?retryWrites=true&w=majority
 
 ### Step 2: Backend (Render Free Tier)
 
-Deploying the Express.js API on Render.com's completely free tier.
-
-**Method A: Automated (Recommended)**
-1. Go to your [Render Blueprints](https://dashboard.render.com/blueprints).
+Method A — Automated (Recommended):
+1. Go to https://dashboard.render.com/blueprints
 2. Click "New Blueprint Instance" and link your GitHub repo.
-3. Render will instantly read the `render.yaml` file (which is hardcoded to the Free Plan) and set up the backend.
-4. Once deployed, open the Render Dashboard, click on your new `felicity-backend` service, go to **Environment**, and fill in the missing values (like `MONGODB_URI` from Step 1, `CLIENT_URL`, etc).
+3. Render reads the render.yaml file (hardcoded to Free Plan) and deploys automatically.
+4. In the Render Dashboard, go to Environment and fill in:
+   - MONGODB_URI  (Atlas connection string from Step 1)
+   - JWT_SECRET   (any long random string)
+   - CLIENT_URL   (your Vercel frontend URL, no trailing slash)
 
-**Method B: Manual Web Service**
-If you don't want to use Blueprints:
+Method B — Manual Web Service:
 1. Click "New + Web Service" on Render.
-2. Select your repository.
-3. Set the Root Directory to `backend`.
-4. Run command: `npm install`, Start command: `npm start`.
-5. Select the **Free** instance type (bottom of the page).
-6. Enter all Environment Variables from your `.env` file (`PORT=5000`, `MONGODB_URI`, `JWT_SECRET`, etc.).
-7. Deploy and copy the API URL (e.g., `https://felicity-api.onrender.com`).
+2. Select your repository, set Root Directory to "backend".
+3. Build command: npm install | Start command: npm start
+4. Select the Free instance type.
+5. Add environment variables (PORT=5000, MONGODB_URI, JWT_SECRET, CLIENT_URL).
+6. Deploy and copy the API URL.
 
-*Note: Free Render instances spin down after 15 minutes of inactivity. The first API request after this will take ~50 seconds to wake up the server.*
+Note: Free Render instances spin down after 15 min of inactivity.
+      The first request after this takes ~50 seconds to wake up.
 
----
+### Step 3: Frontend (Vercel)
 
-### Step 3: Frontend (Vercel / Netlify)
-
-Deploying the React client. We recommend Vercel.
-
-1. Go to [Vercel](https://vercel.com/) and "Add New Project".
+1. Go to https://vercel.com and "Add New Project".
 2. Import your GitHub repository.
-3. Set the Framework Preset to "Vite" (Vercel should detect this automatically).
-4. Set the Root Directory to `frontend`.
-5. **Critical**: Add the following Environment Variables:
-   - `VITE_API_URL`: Insert your Backend API URL from Step 2 (e.g., `https://felicity-api.onrender.com/api`).
-6. Click Deploy.
+3. Set Framework Preset to "Vite" and Root Directory to "frontend".
+4. Add Environment Variable:
+   - VITE_API_URL = <your Render backend URL>/api
+     (e.g., https://felicity-backend-q0e3.onrender.com/api)
+5. Click Deploy.
 
 ### Step 4: Verification
 
-1. Once the frontend is live, navigate to the URL.
-2. Register a new user to confirm the Frontend can successfully contact the Backend and that the Backend can successfully write to the MongoDB Atlas database.
-3. Ensure you have the `roles` correctly configured in your database for your Organizer/Admin accounts if they are hardcoded.
+1. Navigate to your live Vercel URL.
+2. Register a new participant account to confirm end-to-end connectivity.
+3. Log in as Admin (admin@felicity.iiit.ac.in / Admin@123) to verify all roles work.
