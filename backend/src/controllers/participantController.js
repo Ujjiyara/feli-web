@@ -145,13 +145,25 @@ const getMyEvents = async (req, res, next) => {
  */
 const getOrganizers = async (req, res, next) => {
   try {
-    const organizers = await Organizer.find({ isActive: true })
+    const organizersList = await Organizer.find({ isActive: true })
       .select('name category description contactEmail');
 
-    // Add follow status if user is authenticated
-    let organizersWithStatus = organizers.map(org => ({
-      ...org.toObject(),
-      isFollowed: req.user?.followedOrganizers?.includes(org._id) || false
+    // Add follow status, eventCount, and followerCount
+    const organizersWithStatus = await Promise.all(organizersList.map(async (org) => {
+      const eventCount = await Event.countDocuments({ 
+        organizerId: org._id, 
+        status: { $in: ['PUBLISHED', 'ONGOING', 'COMPLETED'] } 
+      });
+      const followerCount = await User.countDocuments({ 
+        followedOrganizers: org._id 
+      });
+
+      return {
+        ...org.toObject(),
+        eventCount,
+        followerCount,
+        isFollowed: req.user?.followedOrganizers?.includes(org._id) || false
+      };
     }));
 
     res.json({
@@ -193,10 +205,19 @@ const getOrganizerById = async (req, res, next) => {
 
     const isFollowed = req.user?.followedOrganizers?.includes(organizer._id) || false;
 
+    const eventCount = await Event.countDocuments({ 
+      organizerId: organizer._id, 
+      status: { $in: ['PUBLISHED', 'ONGOING', 'COMPLETED'] } 
+    });
+    
+    const followerCount = await User.countDocuments({ 
+      followedOrganizers: organizer._id 
+    });
+
     res.json({
       success: true,
       data: {
-        organizer: { ...organizer.toObject(), isFollowed },
+        organizer: { ...organizer.toObject(), isFollowed, eventCount, followerCount },
         upcomingEvents,
         pastEvents
       }
